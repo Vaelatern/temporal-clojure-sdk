@@ -14,6 +14,12 @@
             Functions$Func5
             Functions$Func6]))
 
+(defn _encode_in [arg]
+  (nippy/thaw))
+
+(defn _encode_out [arg]
+  (nippy/freeze arg))
+
 (def ^Class bytes-type (Class/forName "[B"))
 
 (defn build [builder spec params]
@@ -105,12 +111,12 @@
 (defn ->objarray
   "Serializes x to an array of Objects, suitable for many Temporal APIs"
   [x]
-  (into-array Object [(nippy/freeze x)]))
+  (into-array Object [(_encode_out x)]))
 
 (defn ->args
   "Decodes EncodedValues to native clojure data type.  Assumes all data is in the first element"
   [^EncodedValues args]
-  (nippy/thaw (.get args (int 0) bytes-type)))
+  (_encode_in (.get args (int 0) bytes-type)))
 
 (def namify
   "Converts strings or keywords to strings, preserving fully qualified keywords when applicable"
@@ -121,7 +127,7 @@
 (defn complete-invoke
   [stub result]
   (log/trace stub "completed with" (count result) "bytes")
-  (let [r (nippy/thaw result)]
+  (let [r (_encode_in result)]
     (log/trace stub "results:" r)
     r))
 

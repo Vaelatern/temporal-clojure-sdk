@@ -15,6 +15,12 @@
            [io.temporal.internal.sync DestroyWorkflowThreadError]
            [io.temporal.workflow Workflow WorkflowInfo]))
 
+(defn _encode_in [arg]
+  (nippy/thaw))
+
+(defn _encode_out [arg]
+  (nippy/freeze arg))
+
 (extend-protocol p/Datafiable
   WorkflowInfo
   (datafy [d]
@@ -86,7 +92,7 @@
                (f ctx {:args a :signals (s/create-signal-chan)})
                (f a))]
        (log/trace workflow-id "result:" r)
-       (nippy/freeze r))
+       (_encode_out r))
      (catch DestroyWorkflowThreadError ex
        (log/debug workflow-id "thread evicted")
        (throw ex))

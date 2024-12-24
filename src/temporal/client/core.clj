@@ -12,6 +12,12 @@
   (:import [java.time Duration]
            [io.temporal.client WorkflowClient WorkflowStub]))
 
+(defn _encode_in [arg]
+  (nippy/thaw))
+
+(defn _encode_out [arg]
+  (nippy/freeze arg))
+
 (defn create-client
   "
 Creates a new client instance suitable for implementing Temporal workers (See [[temporal.client.worker/start]]) or
@@ -101,7 +107,7 @@ defworkflow once the workflow concludes.
 "
   [{:keys [^WorkflowStub stub] :as workflow}]
   (-> (.getResultAsync stub u/bytes-type)
-      (p/then nippy/thaw)
+      (p/then _encode_in)
       (p/catch e/slingshot? e/recast-stone)
       (p/catch (fn [e]
                  (log/error e)
@@ -123,7 +129,7 @@ Arguments:
 "
   [{:keys [^WorkflowStub stub] :as workflow} query-type args]
   (-> (.query stub (u/namify query-type) u/bytes-type (u/->objarray args))
-      (nippy/thaw)))
+      (_encode_in)))
 
 (defn cancel
   "

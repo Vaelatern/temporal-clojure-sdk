@@ -7,6 +7,12 @@
   (:import [io.temporal.workflow Workflow]
            [java.time Instant]))
 
+(defn _encode_in [arg]
+  (nippy/thaw))
+
+(defn _encode_out [arg]
+  (nippy/freeze arg))
+
 (defn gen-uuid
   "A side-effect friendly random UUID generator"
   []
@@ -15,9 +21,9 @@
 (defn invoke
   "Invokes 'f' via a Temporal [SideEffect](https://docs.temporal.io/concepts/what-is-a-side-effect/)"
   [f]
-  (nippy/thaw
+  (_encode_in
    (Workflow/sideEffect u/bytes-type
-                        (->Func (fn [] (nippy/freeze (f)))))))
+                        (->Func (fn [] (_encode_out (f)))))))
 
 (defn now
   "Returns the java.time.Instant as a SideEffect"

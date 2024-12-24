@@ -12,6 +12,12 @@
   (:import [io.temporal.workflow Workflow]
            [io.temporal.activity Activity]))
 
+(defn _encode_in [arg]
+  (nippy/thaw))
+
+(defn _encode_out [arg]
+  (nippy/freeze arg))
+
 (defn heartbeat
   "
 Used to notify the Workflow Execution that the Activity Execution is alive.
@@ -23,7 +29,7 @@ Arguments:
   [details]
   (let [ctx (Activity/getExecutionContext)]
     (log/trace "heartbeat:" details)
-    (.heartbeat ctx (nippy/freeze details))))
+    (.heartbeat ctx (_encode_out details))))
 
 (defn get-heartbeat-details
   "
@@ -38,7 +44,7 @@ along with the Activity Task for the next retry attempt and can be extracted by 
   (let [ctx (Activity/getExecutionContext)
         details (.getHeartbeatDetails ctx u/bytes-type)]
     (let [v (when (.isPresent details)
-              (nippy/thaw (.get details)))]
+              (_encode_in (.get details)))]
       (log/trace "get-heartbeat-details:" v)
       v)))
 

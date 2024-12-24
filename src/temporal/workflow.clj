@@ -14,6 +14,12 @@
            [java.util.function Supplier]
            [java.time Duration]))
 
+(defn _encode_in [arg]
+  (nippy/thaw))
+
+(defn _encode_out [arg]
+  (nippy/freeze arg))
+
 (defn get-info
   "Return info about the current workflow"
   []
@@ -77,7 +83,7 @@ Arguments:
              args (u/->args args)]
          (log/trace "handling query->" "query-type:" query-type "args:" args)
          (-> (f query-type args)
-             (nippy/freeze)))))))
+             (_encode_out)))))))
 
 (defmacro defworkflow
   "

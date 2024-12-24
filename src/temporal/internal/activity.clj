@@ -16,6 +16,12 @@
            [io.temporal.activity ActivityOptions ActivityOptions$Builder LocalActivityOptions LocalActivityOptions$Builder]
            [clojure.core.async.impl.channels ManyToManyChannel]))
 
+(defn _encode_in [arg]
+  (nippy/thaw))
+
+(defn _encode_out [arg]
+  (nippy/freeze arg))
+
 (def cancellation-type->
   {:abandon                     ActivityCancellationType/ABANDON
    :try-cancel                  ActivityCancellationType/TRY_CANCEL
@@ -87,7 +93,7 @@
 
 (defn- export-result [activity-id x]
   (log/trace activity-id "result:" x)
-  (nippy/freeze x))
+  (_encode_out x))
 
 (defmulti result-> (fn [_ r] (type r)))
 
