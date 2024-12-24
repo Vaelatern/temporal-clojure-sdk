@@ -73,7 +73,9 @@
 
 (defn get-annotation
   ^String [x]
-  (u/get-annotated-name x ::def))
+  (cond
+    (string? x) x
+    :else (u/get-annotated-name x ::def)))
 
 (defn auto-dispatch
   []
