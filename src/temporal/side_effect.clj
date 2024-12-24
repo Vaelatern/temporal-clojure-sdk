@@ -8,10 +8,10 @@
            [java.time Instant]))
 
 (defn _encode_in [arg]
-  (nippy/thaw))
+  (clojure.edn/read (java.io.PushbackReader. (clojure.java.io/reader arg))))
 
 (defn _encode_out [arg]
-  (nippy/freeze arg))
+  (.getBytes (pr-str arg)))
 
 (defn gen-uuid
   "A side-effect friendly random UUID generator"

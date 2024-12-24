@@ -16,10 +16,10 @@
            [io.temporal.workflow Workflow WorkflowInfo]))
 
 (defn _encode_in [arg]
-  (nippy/thaw))
+  (clojure.edn/read (java.io.PushbackReader. (clojure.java.io/reader arg))))
 
 (defn _encode_out [arg]
-  (nippy/freeze arg))
+  (.getBytes (pr-str arg)))
 
 (extend-protocol p/Datafiable
   WorkflowInfo
